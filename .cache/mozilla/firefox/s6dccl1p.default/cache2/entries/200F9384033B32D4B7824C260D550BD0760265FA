@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+		<link rel="pingback" href="http://tomaszmazur.eu/xmlrpc.php">
+		<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>SSH i klucze DSA, czyli logowanie bez wpisywania hasła - Tomasz Mazur</title>
+
+<!-- This site is optimized with the Yoast SEO plugin v3.2.5 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="http://tomaszmazur.eu/2013/01/29/ssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla/" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="SSH i klucze DSA, czyli logowanie bez wpisywania hasła - Tomasz Mazur" />
+<meta property="og:description" content="Dzisiaj opiszę bardzo przydatną i praktyczną poradę, dotyczącą logowania się na serwer za pomocą SSH. W codziennej pracy możemy się logować na dany serwer nawet po kilkadziesiąt razy, a za każdym razem musimy wpisać hasło. Jest to oczywiście mało wygodne i czasochłonne. Rozwiązaniem tego problemu jest skorzystanie z pary kluczy DSA. Zakładam, że korzystamy z &hellip; Continue reading &quot;SSH i klucze DSA, czyli logowanie bez wpisywania hasła&quot;" />
+<meta property="og:url" content="http://tomaszmazur.eu/2013/01/29/ssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla/" />
+<meta property="og:site_name" content="Tomasz Mazur" />
+<meta property="article:published_time" content="2013-01-29T19:13:35+02:00" />
+<meta property="article:modified_time" content="2016-01-19T19:19:32+02:00" />
+<meta property="og:updated_time" content="2016-01-19T19:19:32+02:00" />
+<meta property="og:image" content="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth-300x288.png" />
+<meta property="og:image" content="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys-300x149.png" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:description" content="Dzisiaj opiszę bardzo przydatną i praktyczną poradę, dotyczącą logowania się na serwer za pomocą SSH. W codziennej pracy możemy się logować na dany serwer nawet po kilkadziesiąt razy, a za każdym razem musimy wpisać hasło. Jest to oczywiście mało wygodne i czasochłonne. Rozwiązaniem tego problemu jest skorzystanie z pary kluczy DSA. Zakładam, że korzystamy z &hellip; Continue reading &quot;SSH i klucze DSA, czyli logowanie bez wpisywania hasła&quot;" />
+<meta name="twitter:title" content="SSH i klucze DSA, czyli logowanie bez wpisywania hasła - Tomasz Mazur" />
+<meta name="twitter:image" content="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth-300x288.png" />
+<!-- / Yoast SEO plugin. -->
+
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="Tomasz Mazur &raquo; Feed" href="http://tomaszmazur.eu/en/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Tomasz Mazur &raquo; Comments Feed" href="http://tomaszmazur.eu/en/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Tomasz Mazur &raquo; SSH i klucze DSA, czyli logowanie bez wpisywania hasła Comments Feed" href="http://tomaszmazur.eu/2013/01/29/ssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/tomaszmazur.eu\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.7.3"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),!(j.toDataURL().length<3e3)&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,65039,8205,55356,57096),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,55356,57096),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55357,56425,55356,57341,8205,55357,56507),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55357,56425,55356,57341,55357,56507),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='ccchildpagescss-css'  href='http://tomaszmazur.eu/wp-content/plugins/cc-child-pages/includes/css/styles.css?ver=1.32' type='text/css' media='all' />
+<link rel='stylesheet' id='ccchildpagesskincss-css'  href='http://tomaszmazur.eu/wp-content/plugins/cc-child-pages/includes/css/skins.css?ver=1.32' type='text/css' media='all' />
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='ccchildpagesiecss-css'  href='http://tomaszmazur.eu/wp-content/plugins/cc-child-pages/includes/css/styles.ie.css?ver=1.32' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='responsive-lightbox-swipebox-css'  href='http://tomaszmazur.eu/wp-content/plugins/responsive-lightbox/assets/swipebox/css/swipebox.min.css?ver=1.6.8' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-fonts-css'  href='https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<link rel='stylesheet' id='genericons-css'  href='http://tomaszmazur.eu/wp-content/themes/twentysixteen/genericons/genericons.css?ver=3.4.1' type='text/css' media='all' />
+<link rel='stylesheet' id='twentysixteen-style-css'  href='http://tomaszmazur.eu/wp-content/themes/twentysixteen/style.css?ver=4.7.3' type='text/css' media='all' />
+<!--[if lt IE 10]>
+<link rel='stylesheet' id='twentysixteen-ie-css'  href='http://tomaszmazur.eu/wp-content/themes/twentysixteen/css/ie.css?ver=20150930' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentysixteen-ie8-css'  href='http://tomaszmazur.eu/wp-content/themes/twentysixteen/css/ie8.css?ver=20151230' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentysixteen-ie7-css'  href='http://tomaszmazur.eu/wp-content/themes/twentysixteen/css/ie7.css?ver=20150930' type='text/css' media='all' />
+<![endif]-->
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-includes/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/plugins/responsive-lightbox/assets/swipebox/js/jquery.swipebox.min.js?ver=1.6.8'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var rlArgs = {"script":"swipebox","selector":"lightbox","customEvents":"","activeGalleries":"1","animation":"1","hideCloseButtonOnMobile":"0","removeBarsOnMobile":"0","hideBars":"1","hideBarsDelay":"5000","videoMaxWidth":"1080","useSVG":"1","loopAtEnd":"0"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/plugins/responsive-lightbox/js/front.js?ver=1.6.8'></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/themes/twentysixteen/js/html5.js?ver=3.7.3'></script>
+<![endif]-->
+<link rel='https://api.w.org/' href='http://tomaszmazur.eu/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://tomaszmazur.eu/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://tomaszmazur.eu/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 4.7.3" />
+<link rel='shortlink' href='http://tomaszmazur.eu/?p=32' />
+<link rel="alternate" type="application/json+oembed" href="http://tomaszmazur.eu/wp-json/oembed/1.0/embed?url=http%3A%2F%2Ftomaszmazur.eu%2F2013%2F01%2F29%2Fssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://tomaszmazur.eu/wp-json/oembed/1.0/embed?url=http%3A%2F%2Ftomaszmazur.eu%2F2013%2F01%2F29%2Fssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla%2F&#038;format=xml" />
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		<style type="text/css" id="syntaxhighlighteranchor"></style>
+</head>
+
+<body class="post-template-default single single-post postid-32 single-format-standard">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-header-main">
+				<div class="site-branding">
+											<p class="site-title"><a href="http://tomaszmazur.eu/en/" rel="home">Tomasz Mazur</a></p>
+									</div><!-- .site-branding -->
+
+									<button id="menu-toggle" class="menu-toggle">Menu</button>
+
+					<div id="site-header-menu" class="site-header-menu">
+													<nav id="site-navigation" class="main-navigation" role="navigation" aria-label="Primary Menu">
+								<div class="menu-top-menu-en-container"><ul id="menu-top-menu-en" class="primary-menu"><li id="menu-item-190" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-190"><a href="http://tomaszmazur.eu/en">Blog</a></li>
+<li id="menu-item-237" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-237"><a href="http://tomaszmazur.eu/en/about-me/">About me</a></li>
+<li id="menu-item-189-pl" class="lang-item lang-item-2 lang-item-pl no-translation menu-item menu-item-type-custom menu-item-object-custom menu-item-189-pl"><a href="http://tomaszmazur.eu/pl/" hreflang="pl-PL"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEISURBVHjaYvz/8SMDDPyD43//gPQ/bAAggFhACvn4gMT///8Zwdr+/wcRjP//MzMwMP1HAV+ePQMIIBYGqKL/yIz/2AAjI+O/P38AAoiFSNUQKaCTAAKIBehWRrhqMMSjAagDIIBYGPj5Gfr6/j979v/PH4Y/f/7D0e/f/38DGb/BjN8gWWnpfwsXAgQQ2EkPH/5/8OD/718MvyHqfv3/9fv/r18gNhLJ+OkT0DkAAQR2ElgIZDyyIlTVEMv/MDAABBBIAzPYAQxwRZja/gA1/GX4+xfoHIAAAmlg+v2HQVISbMxfhj8gnYxgIxkgJBD9/QtBQMUAAcT4FRy5cMSAykWTAgKAAAMA0PVcqMe0XaEAAAAASUVORK5CYII=" title="Polski" alt="Polski" /><span style="margin-left:0.3em;">Polski</span></a></li>
+</ul></div>							</nav><!-- .main-navigation -->
+						
+											</div><!-- .site-header-menu -->
+							</div><!-- .site-header-main -->
+
+					</header><!-- .site-header -->
+
+		<div id="content" class="site-content">
+
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+		
+<article id="post-32" class="post-32 post type-post status-publish format-standard hentry">
+	<header class="entry-header">
+		<h1 class="entry-title">SSH i klucze DSA, czyli logowanie bez wpisywania hasła</h1>	</header><!-- .entry-header -->
+
+	
+	
+	<div class="entry-content">
+		<div class="post-content">
+<p>Dzisiaj opiszę bardzo przydatną i praktyczną poradę, dotyczącą logowania się na serwer za pomocą SSH. W codziennej pracy możemy się logować na dany serwer nawet po kilkadziesiąt razy, a za każdym razem musimy wpisać hasło. Jest to oczywiście mało wygodne i czasochłonne. Rozwiązaniem tego problemu jest skorzystanie z pary <a href="http://pl.wikipedia.org/wiki/Kryptografia_klucza_publicznego">kluczy DSA</a>.</p>
+<p>Zakładam, że korzystamy z Windowsa i Putty do logowania się na serwer z Linuksem. Ze strony <a href="http://www.putty.org/">PuTTY</a> należy ściągnąć PuTTY, PuTTYgen i Pageant. W pierwszym kroku należy wygenerować klucze DSA na serwerze, do którego chcemy się wygodnie logować. Uruchamiamy Putty i logujemy się na serwer tak jak zwykle (cieszymy się faktem, że ostatni raz wpisujemy hasło :)). W katalogu domowym tworzymy folder .ssh z prawami dostępu 700.</p>
+<pre class="brush: bash; title: ; notranslate" title="">mkdir .ssh
+chmod 700 .ssh
+</pre>
+<p>Następnie uruchamiamy polecenie odpowiedzialne za wygenerowanie klucza:</p>
+<pre class="brush: bash; title: ; notranslate" title="">ssh-keygen -t dsa</pre>
+<p>Zostaniemy poproszeni o podanie nazwy pliku w którym zostanie zapisany klucz(zostawiamy domyślne), oraz passphrase(hasło zabezpieczające klucz). Passphrase powinno być różne od hasła dostępu do konta. Jeżeli ktoś wszedłby w posiadanie tego klucza, jedyne co dzieli go od zalogowania się na serwer jest właśnie podany passphrase. Można również ustawić pusty passphrase, co jest dość niebezpieczne, ale wygodne. Szczegółowe wyjaśnienia znajdą się pod koniec artykułu. Dopisujemy klucz publiczny <em>id_rsa.pub</em> do pliku <em>authorized_keys</em>.</p>
+<pre class="brush: bash; title: ; notranslate" title="">cat id_dsa.pub &amp;gt;&amp;gt; authorized_keys</pre>
+<p>Możemy teraz ustawić odpowiednie prawa dla wszystkich plików w katalogu:</p>
+<pre class="brush: bash; title: ; notranslate" title="">chmod 600 *</pre>
+<p>To by było na tyle jeśli chodzi o pracę na serwerze. Ściągamy plik <em>id_dsa</em> na komputer lokalny. Otwieramy PuTTYgen, z menu wybieramy <em>Actions-&gt;load</em>. Wybieramy nasz plik <em>id_dsa </em>i wpisujemy odpowiedni passphrase. Zapiszemy teraz klucz w formacie zrozumiałym dla Putty. Klikamy <em>save public key</em> i zapisujemy pod nazwą <em>moja_nazwa.pub</em>, analogicznie <em>save private key</em> pod nazwą <em>moja_nazwa.ppk</em>. Pliki umieszamy dowolnym katalogu, np. w katalogu z Putty, lub naszym katalogu domym w podfolderze <em>.ssh</em>.</p>
+<p>Ostatnim krokiem jest ustawienie Putty tak, aby korzystał z wygenerowanych kluczy. Uruchamiamy Putty i przechodzimy do edycji sesji połączenia z naszym serwerem &#8211; klikamy na sesję, a następnie przycisk <em>Load</em>. W zakładce <em>Connection-&gt;SSH-&gt;Auth</em> w polu <em>Private key file for authentication</em> wybieramy przed chwilą zapisany plik <em>moja_nazwa.ppk</em>. Pamiętajmy, aby wrócić do zakładki <em>Session</em> i klikąć <em>Save</em>. Już teraz powinniśmy móc się zalogować na serwer korzystając z naszego klucza prywatnego. Zamiast hasła wystarczy podać passphrase.</p>
+<p><a href="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth.png" data-rel="lightbox-gallery-83J5" title=""><img class="alignnone wp-image-33 size-medium" src="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth-300x288.png" alt="putty_auth" width="300" height="288" srcset="http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth-300x288.png 300w, http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth.png 466w" sizes="(max-width: 300px) 85vw, 300px" /></a></p>
+<p>Naszym celem było logowanie się bez podawania hasła, jednak dalej przy każdym logowaniu musimy podawać nieszczęsny passphrase. Aby tego uniknąć musimy skonfigurować Pageant. Jest to narzędzie które przechowuje klucze prywatne w postaci zdekodowanej w pamięci, tak abyśmy nie musieli za każdym logowaniem podawać passphrase do klucza. Jednym sposobem jest każdorazowo uruchamianie Pageant i dodanie klucza z poziomu menu dostępnego w programie. Lepszym sposobem jest utworzenie skrótu do Pageant, który automatycznie załaduje wybrany klucz. Tworzymy zwykły skrót do Pageant, edytujemy jego właściwości, w polu <em>element docelowy</em> po spacji dopisujemy lokalizację naszego klucza prywatnego. Wygląda to następująco:</p>
+<pre class="brush: bash; title: ; notranslate" title="">C:\Programy\putty\pageant.exe C:\Programy\putty\moj_klucz.ppk</pre>
+<p>Uruchamiamy Pageant poprzez utworzony skrót, zostaniemy poproszeni o podanie passphrase. Od tej chwili klucz rezyduje w pamięci i nie ma potrzeby już więcej wpisywać passphrase. Taki skrót możemy umieścić w autouruchamianiu Windowsa, lub uruchamiać za każdym razem jak rozpoczynamy pracę na serwerze. Tak skonfigurowane Putty pozwala również na korzystanie z TortoiseSVN bez podawania hasła, o ile korzystamy z protokołu SSH.</p>
+<p>Chciałbym jeszcze wrócić do kwestii pustego passphrase. Wiemy już kiedy musimy go podawać, w optymistycznym przypadku jest to raz na dzień (pracy). Ustawiając pusty passphrase nie musimy go podawać w ogóle. Rozwiązanie bardzo wygodne, ale musimy się liczyć z konsekwencjami. Każdy kto wejdzie w posiadanie naszego klucza prywatnego będzie w stanie się zalogować na serwer bez znajomości hasła/passphrase.</p>
+<p>W przeszłości, na jednym z serwerów napotkałem problem z logowaniem się za pomocą kluczy DSA. Rozwiązaniem było zmodyfikowanie klucza publicznego po stronie serwera. Z końcówki pliku <em>authorized_keys </em>(zakładam, że plik posiada tylko jeden klucz, tj. jedną linijkę) musimy usunąć część nazwy domeny, tak aby końcówka pliku wyglądała tak jak nazwa użytkownika i domeny w tytule okienka z Putty.</p>
+<p><a href="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys.png" rel="attachment wp-att-34" data-rel="lightbox-gallery-83J5" title=""><img class="alignnone size-medium wp-image-34" src="http://wp.tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys-300x149.png" alt="putty_keys" width="300" height="149" srcset="http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys-300x149.png 300w, http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys-768x381.png 768w, http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys.png 814w" sizes="(max-width: 300px) 85vw, 300px" /></a></p>
+</div>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="byline"><span class="author vcard"><img alt='' src='http://0.gravatar.com/avatar/652e07d5fa01b38e7026c35139e9ba62?s=49&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/652e07d5fa01b38e7026c35139e9ba62?s=98&amp;d=mm&amp;r=g 2x' class='avatar avatar-49 photo' height='49' width='49' /><span class="screen-reader-text">Author </span> <a class="url fn n" href="http://tomaszmazur.eu/en/author/mazurt/">mazurt</a></span></span><span class="posted-on"><span class="screen-reader-text">Posted on </span><a href="http://tomaszmazur.eu/2013/01/29/ssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla/" rel="bookmark"><time class="entry-date published" datetime="2013-01-29T19:13:35+00:00">January 29, 2013</time><time class="updated" datetime="2016-01-19T19:19:32+00:00">January 19, 2016</time></a></span><span class="cat-links"><span class="screen-reader-text">Categories </span>Uncategorized</span>			</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+<div id="comments" class="comments-area">
+
+	
+	
+		<div id="respond" class="comment-respond">
+		<h2 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2013/01/29/ssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla/#respond" style="display:none;">Cancel reply</a></small></h2>			<form action="http://tomaszmazur.eu/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+				<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p><p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" aria-required="true" required="required"></textarea></p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" aria-required='true' required='required' /></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" maxlength="100" aria-describedby="email-notes" aria-required='true' required='required' /></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" /></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment" /> <input type='hidden' name='comment_post_ID' value='32' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="ecb510bd83" /></p><p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="23"/></p>			</form>
+			</div><!-- #respond -->
+	
+</div><!-- .comments-area -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-next"><a href="http://tomaszmazur.eu/en/2016/01/25/just-a-test-post-in-english/" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">English version under way!</span></a></div></div>
+	</nav>
+	</main><!-- .site-main -->
+
+	
+</div><!-- .content-area -->
+
+
+	<aside id="secondary" class="sidebar widget-area" role="complementary">
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://tomaszmazur.eu/en/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" title="Search for:" />
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+</form>
+</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="http://tomaszmazur.eu/2016/04/23/diff-merge-tool-syntax-highlighting-meld/">Diff and merge tool with syntax highlighting: Meld</a>
+						</li>
+					<li>
+				<a href="http://tomaszmazur.eu/2016/03/06/googlemock-testing-method-mocking-another-class/">GoogleMock: Testing a method and mocking another in the same class</a>
+						</li>
+					<li>
+				<a href="http://tomaszmazur.eu/en/2016/01/25/just-a-test-post-in-english/">English version under way!</a>
+						</li>
+				</ul>
+		</section>		<section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h2 class="widget-title">Archives</h2>		<ul>
+			<li><a href='http://tomaszmazur.eu/en/2016/04/'>April 2016</a></li>
+	<li><a href='http://tomaszmazur.eu/en/2016/03/'>March 2016</a></li>
+	<li><a href='http://tomaszmazur.eu/en/2016/01/'>January 2016</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h2 class="widget-title">Categories</h2>		<ul>
+	<li class="cat-item cat-item-40"><a href="http://tomaszmazur.eu/en/category/c/" >C++</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://tomaszmazur.eu/en/category/general/" >General</a>
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h2 class="widget-title">Meta</h2>			<ul>
+						<li><a rel="nofollow" href="http://tomaszmazur.eu/wp-login.php">Log in</a></li>
+			<li><a href="http://tomaszmazur.eu/en/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://tomaszmazur.eu/en/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>	</aside><!-- .sidebar .widget-area -->
+
+		</div><!-- .site-content -->
+
+		<footer id="colophon" class="site-footer" role="contentinfo">
+							<nav class="main-navigation" role="navigation" aria-label="Footer Primary Menu">
+					<div class="menu-top-menu-en-container"><ul id="menu-top-menu-en-1" class="primary-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-190"><a href="http://tomaszmazur.eu/en">Blog</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-237"><a href="http://tomaszmazur.eu/en/about-me/">About me</a></li>
+<li class="lang-item lang-item-2 lang-item-pl no-translation menu-item menu-item-type-custom menu-item-object-custom menu-item-189-pl"><a href="http://tomaszmazur.eu/pl/" hreflang="pl-PL"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEISURBVHjaYvz/8SMDDPyD43//gPQ/bAAggFhACvn4gMT///8Zwdr+/wcRjP//MzMwMP1HAV+ePQMIIBYGqKL/yIz/2AAjI+O/P38AAoiFSNUQKaCTAAKIBehWRrhqMMSjAagDIIBYGPj5Gfr6/j979v/PH4Y/f/7D0e/f/38DGb/BjN8gWWnpfwsXAgQQ2EkPH/5/8OD/718MvyHqfv3/9fv/r18gNhLJ+OkT0DkAAQR2ElgIZDyyIlTVEMv/MDAABBBIAzPYAQxwRZja/gA1/GX4+xfoHIAAAmlg+v2HQVISbMxfhj8gnYxgIxkgJBD9/QtBQMUAAcT4FRy5cMSAykWTAgKAAAMA0PVcqMe0XaEAAAAASUVORK5CYII=" title="Polski" alt="Polski" /><span style="margin-left:0.3em;">Polski</span></a></li>
+</ul></div>				</nav><!-- .main-navigation -->
+			
+			
+			<div class="site-info">
+								<span class="site-title"><a href="http://tomaszmazur.eu/en/" rel="home">Tomasz Mazur</a></span>
+				<a href="https://wordpress.org/">Proudly powered by WordPress</a>
+			</div><!-- .site-info -->
+		</footer><!-- .site-footer -->
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/plugins/akismet/_inc/form.js?ver=3.1.11'></script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js?ver=3.0.9b'></script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushBash.js?ver=3.0.9b'></script>
+<script type='text/javascript'>
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+</script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20151112'></script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-includes/js/comment-reply.min.js?ver=4.7.3'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-content/themes/twentysixteen/js/functions.js?ver=20151204'></script>
+<script type='text/javascript' src='http://tomaszmazur.eu/wp-includes/js/wp-embed.min.js?ver=4.7.3'></script>
+<!-- Piwik -->
+<script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.tomaszmazur.eu/" : "http://piwik.tomaszmazur.eu/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+</script><noscript><p><img src="http://piwik.tomaszmazur.eu/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<!-- End Piwik Tracking Code -->
+</body>
+</html>
+�i�x�           Yԯ�>D�       X    :http://tomaszmazur.eu/2013/01/29/ssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla/ strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Date: Wed, 04 Oct 2017 09:55:04 GMT
+Server: Apache
+X-Pingback: http://tomaszmazur.eu/xmlrpc.php
+Link: <http://tomaszmazur.eu/wp-json/>; rel="https://api.w.org/", <http://tomaszmazur.eu/?p=32>; rel=shortlink
+Content-Type: text/html; charset=UTF-8
+ original-response-headers Date: Wed, 04 Oct 2017 09:55:04 GMT
+Server: Apache
+X-Pingback: http://tomaszmazur.eu/xmlrpc.php
+Link: <http://tomaszmazur.eu/wp-json/>; rel="https://api.w.org/"
+Link: <http://tomaszmazur.eu/?p=32>; rel=shortlink
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+ charset UTF-8 uncompressed-len 0 predictor::resource-count 32 predictor::http://tomaszmazur.eu/wp-content/plugins/cc-child-pages/includes/css/styles.css?ver=1.32 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/cc-child-pages/includes/css/skins.css?ver=1.32 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/responsive-lightbox/assets/swipebox/css/swipebox.min.css?ver=1.6.8 1,1,0,4096 predictor::https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&subset=latin%2Clatin-ext 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/themes/twentysixteen/genericons/genericons.css?ver=3.4.1 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/themes/twentysixteen/style.css?ver=4.7.3 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-includes/js/jquery/jquery.js?ver=1.12.4 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/responsive-lightbox/assets/swipebox/js/jquery.swipebox.min.js?ver=1.6.8 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/responsive-lightbox/js/front.js?ver=1.6.8 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_auth-300x288.png 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/uploads/2016/01/putty_keys-300x149.png 1,1,0,4096 predictor::http://0.gravatar.com/avatar/652e07d5fa01b38e7026c35139e9ba62?s=49&d=mm&r=g 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/akismet/_inc/form.js?ver=3.1.11 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js?ver=3.0.9b 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushBash.js?ver=3.0.9b 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/themes/twentysixteen/js/skip-link-focus-fix.js?ver=20151112 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-includes/js/comment-reply.min.js?ver=4.7.3 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/themes/twentysixteen/js/functions.js?ver=20151204 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-includes/js/wp-embed.min.js?ver=4.7.3 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-includes/js/wp-emoji-release.min.js?ver=4.7.3 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b 1,1,0,4096 predictor::http://tomaszmazur.eu/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0.9b 1,1,0,4096 predictor::http://piwik.tomaszmazur.eu/piwik.js 1,1,0,4096 predictor::https://fonts.gstatic.com/s/montserrat/v10/IQHow_FEYlDC4Gzy_m8fcoWiMMZ7xLd792ULpGE4W_Y.woff2 1,1,0,4096 predictor::https://fonts.gstatic.com/s/montserrat/v10/IQHow_FEYlDC4Gzy_m8fchHJTnCUrjaAm2S9z52xC3Y.woff2 1,1,0,4096 predictor::https://fonts.gstatic.com/s/merriweather/v17/RFda8w1V0eDZheqfcyQ4EOgdm0LZdjqr5-oayXSOefg.woff2 1,1,0,4096 predictor::https://fonts.gstatic.com/s/merriweather/v17/RFda8w1V0eDZheqfcyQ4ED0LW-43aMEzIO6XUTLjad8.woff2 1,1,0,4096 predictor::https://fonts.gstatic.com/s/inconsolata/v15/BjAYBlHtW3CJxDcjzrnZCI4P5ICox8Kq3LLUNMylGO4.woff2 1,1,0,4096 predictor::https://fonts.gstatic.com/s/merriweather/v17/So5lHxHT37p2SS4-t60SlBMBlNeli-0RcAdOFWWLdxQ.woff2 1,1,0,4096 predictor::https://fonts.gstatic.com/s/montserrat/v10/zhcz-_WihjSQC0oHJ9TCYPk_vArhqVIZ0nv9q090hN8.woff2 1,1,0,4096 predictor::http://piwik.tomaszmazur.eu/piwik.php?action_name=SSH%20i%20klucze%20DSA%2C%20czyli%20logowanie%20bez%20wpisywania%20has%C5%82a%20-%20Tomasz%20Mazur&idsite=1&rec=1&r=302890&h=11&m=55&s=5&url=http%3A%2F%2Ftomaszmazur.eu%2F2013%2F01%2F29%2Fssh-i-klucze-dsa-czyli-logowanie-bez-wpisywania-hasla%2F&_id=729743f5635dd700&_idts=1507107913&_idvc=2&_idn=0&_refts=1507110841&_viewts=1507110841&_ref=https%3A%2F%2Fwww.google.pl%2F&send_image=1&cookie=1&res=1600x900&gt_ms=712&pv_id=uGt2nz 1,1,0,4096   w2

@@ -1,0 +1,19 @@
+Skrypt dla ibus rozpoczęto w run_im.
+Skrypt dla auto rozpoczęto w run_im.
+Skrypt dla default rozpoczęto w run_im.
+init: Proces upstart-event-bridge main (1378) został zakończony ze stanem 1
+init: Proces upstart-event-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-file-bridge main (1447) został zakończony ze stanem 1
+init: Proces upstart-file-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-dbus-session-bridge main (1449) został zakończony ze stanem 1
+init: Proces upstart-dbus-session-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-dbus-system-bridge main (1451) został zakończony ze stanem 1
+init: Proces upstart-dbus-system-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-event-bridge main (19853) został zakończony ze stanem 1
+init: Proces upstart-event-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-file-bridge main (19860) został zakończony ze stanem 1
+init: Proces upstart-file-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-dbus-system-bridge main (19864) został zakończony ze stanem 1
+init: Proces upstart-dbus-system-bridge main został zakończony, ponowne uruchamianie
+init: Proces upstart-dbus-session-bridge main (19865) został zakończony ze stanem 1
+init: Proces upstart-dbus-session-bridge main został zakończony, ponowne uruchamianie
